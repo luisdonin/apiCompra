@@ -28,6 +28,24 @@ public class CompraController {
             System.err.println("Erro no serviço de email" + e.getMessage());
         }
 
-        return ResponseEntity.ok(Map.of("mensagem", "Compra efetuada, email enviado"));
+        return ResponseEntity.ok(Map.of("mensagem", "Compra efetuada, email enviado, " + compra.getNome() + " aguarde a confirmação da transação"));
+    }
+
+    @PostMapping("/transacao")
+    public ResponseEntity<Map<String, String>> transacaoConcluida(@RequestBody Compra compra) {
+        System.out.println("Compra recebida" + compra.getNome());
+        String emailApiUrl = "http://localhost:8083/enviaemail/transacao";
+
+        Map<String, String> emailPayload = Map.of(
+                "email", compra.getEmail(),
+                "nome", compra.getNome()
+        );
+        try {
+            restTemplate.postForObject(emailApiUrl, emailPayload, String.class);
+        }catch (Exception e){
+            System.err.println("Erro no serviço de email" + e.getMessage());
+        }
+
+        return ResponseEntity.ok(Map.of("mensagem", "Transacao efetuada, email enviado"));
     }
 }
